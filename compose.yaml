@@ -1,0 +1,18 @@
+version: '3'
+services:
+  web:
+    restart: on-failure
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/usr/src/app
+    hostname: web
+    ports:
+      - '80:5000'
+  redis:
+    image: redis
+    hostname: redis
+    ports:
+      - '6379:6379'
+      
