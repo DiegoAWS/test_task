@@ -19,7 +19,7 @@ app.get('/', (req, res) => {
 
 app.get('/test-redis', async (req, res) => {
 
-    const elements = 20_000;
+    const elements = 2_000;
 
     // mesure time to insert ${elements} strings
     const start0 = Date.now();
@@ -37,11 +37,14 @@ app.get('/test-redis', async (req, res) => {
     const end2 = Date.now();
     console.log(`Get ${elements} strings in ${end2 - start2}ms`);
 
+    const average = (end0 - start0 + end2 - start2) / (2 * elements)
+
+    console.log(`Average ${average}ms`)
+
     res.json({
-        redisVersion: client,
         insert: end0 - start0,
         get: end2 - start2,
-        average: (end0 - start0 + end2 - start2) / 2 * elements
+        average
     });
 });
 
