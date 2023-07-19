@@ -3,10 +3,10 @@ services:
   web:
     restart: on-failure
     build:
-      context: .
+      context: ./app
       dockerfile: Dockerfile
     volumes:
-      - .:/usr/src/app
+      - ./app:/usr/src/app
     hostname: web
     ports:
       - '80:5000'
