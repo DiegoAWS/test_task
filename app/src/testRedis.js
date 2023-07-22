@@ -40,3 +40,9 @@ console.log(`Get ${elements} users in ${end1 - start1}ms`);
 
 const averageElementTime = (end + end1 + end2 + end0 - start - start1 - start2 - start0) / (4 * elements);
 console.log(`Average time per element: ${averageElementTime}ms`);
+
+
+const checker = (a) => {
+    console.log(a)
+    return a
+}
