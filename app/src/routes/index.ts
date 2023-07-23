@@ -1,9 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import express from 'express';
-import { limiter } from '../middlewares/trottle-api.js';
-export const router = express.Router()
 
-router.use(limiter())
+export const router = express.Router()
 
 router.get('/', (req, res) => {
     res.send('Hello World!');

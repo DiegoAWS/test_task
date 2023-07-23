@@ -1,45 +1,31 @@
 import { NextFunction, Request, Response } from "express";
-import { client } from "../index.js";
-import { TokenBucket } from "../types.js";
+import { decrementCounterBy, getCounter, getTimeToLive, setCounter } from "../services/counterService.js";
+import { TIME_WINDOWS } from "../constants.js";
 
-const tokenLimitByHours = Number(process.env.TOKEN_LIMIT_BY_HOURS) || 3;
-const ONE_HOUR = 60 * 60 * 1000;
 
-export function limiter() {
+
+export function limiter(token: string, tokenLimit: number, weight: number) {
     return async function (req: Request, res: Response, next: NextFunction) {
-        const token = req.headers['x-api-key'];
 
-        if (!token || typeof token !== 'string') {
-            return res.status(401).json({
-                message: 'Unauthorized'
-            });
-        }
+        const tokenAvailables = await getCounter(token);
 
-        res.setHeader('X-RateLimit-Limit', tokenLimitByHours.toString());
-
-        const tokenBucket = await client.hGetAll(token);
-
-        if (!tokenBucket?.timestamp || (Date.now() - Number(tokenBucket.timestamp)) > ONE_HOUR) {
-            const created = await client.hSet(token, {
-                timestamp: Date.now().toString(),
-                count: tokenLimitByHours.toString()
-            });
-            res.setHeader('X-RateLimit-Remaining', tokenLimitByHours.toString());
-            res.setHeader('X-RateLimit-Reset', (Date.now() + ONE_HOUR).toString());
+        if (tokenAvailables===null) {
+            const newTokenAvailable = tokenLimit - 1;
+            await setCounter(token, newTokenAvailable, TIME_WINDOWS);
+            res.setHeader('X-RateLimit-Remaining', newTokenAvailable);
             return next();
         }
 
-        if (Number(tokenBucket.count) > 0) {
-            const updated = await client.hSet(token, {
-                timestamp: tokenBucket.timestamp,
-                count: (Number(tokenBucket.count) - 1).toString()
-            })
-            res.setHeader('X-RateLimit-Remaining', (Number(tokenBucket.count) - 1).toString());
-            res.setHeader('X-RateLimit-Reset', (Number(tokenBucket.timestamp) + ONE_HOUR).toString());
+        if (tokenAvailables > 0) {
+            const counterNewValue = await decrementCounterBy(token, weight);
+            res.setHeader('X-RateLimit-Remaining', counterNewValue);
+
 
             return next();
         }
 
+        const timeToLive = await getTimeToLive(token);
+        res.setHeader('X-RateLimit-Reset', timeToLive);
         res.status(429).json({
             message: 'Too many requests'
         });
