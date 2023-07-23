@@ -1,6 +1,10 @@
 import { NextFunction, Request, Response } from "express";
-import { ENDPOINT_TYPE, TOKEN_LIMIT_PRIVATE_ENDPOINTS, TOKEN_LIMIT_PUBLIC_ENDPOINTS } from "../constants";
+import { ENDPOINT_TYPE } from "../constants";
 import { limiter } from "./trottle-api";
+
+const TOKEN_LIMIT_PRIVATE_ENDPOINTS = Number(process.env.TOKEN_LIMIT_PRIVATE_ENDPOINTS || 200)
+const TOKEN_LIMIT_PUBLIC_ENDPOINTS = Number(process.env.TOKEN_LIMIT_PUBLIC_ENDPOINTS || 100)
+
 
 /**
  * 

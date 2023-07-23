@@ -1,6 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import { decrementCounterBy, getCounter, getTimeToLive, setCounter } from "../services/counterService.js";
-import { TIME_WINDOWS } from "../constants.js";
+
+const timeWindows = Number(process.env.TIME_WINDOWS_SECONDS || 60);
+
 
 /**
  * 
@@ -27,11 +29,14 @@ import { TIME_WINDOWS } from "../constants.js";
 export function limiter(token: string, tokenLimit: number, weight: number) {
     return async function (req: Request, res: Response, next: NextFunction) {
 
+        console.log({ token })
         const tokenAvailables = await getCounter(token);
+
+        console.log({ tokenAvailables })
 
         if (tokenAvailables===null) {
             const newTokenAvailable = tokenLimit - 1;
-            await setCounter(token, newTokenAvailable, TIME_WINDOWS);
+            await setCounter(token, newTokenAvailable, timeWindows);
             
             res.setHeader('X-RateLimit-Remaining', newTokenAvailable);
             return next();

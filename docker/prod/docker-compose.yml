@@ -3,16 +3,11 @@ services:
   web:
     restart: on-failure
     build:
-      context: ./app
-      dockerfile: Dockerfile
-    volumes:
-      - ./app:/usr/src/app
+      context: ../../app
+      dockerfile: Dockerfile.prod
     hostname: web
     ports:
       - '80:5000'
   redis:
     image: redis
     hostname: redis
-    ports:
-      - '6379:6379'
-      
