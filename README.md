@@ -60,7 +60,7 @@ npm install
 npm start
 ```
 
-Aditionally you'll need to have a redis server running and update the key `REDIS_PATH` in 
+Aditionally you'll need to have a redis server running and update the key `REDIS_URL` in `app/.env`.
 
 The server will start on port `3000`.
 
@@ -87,4 +87,4 @@ To run tests, use the following command:
 bash test/test-script.sh
 ```
 
-And a `.log` file will be generated with the test results.
+And a `.log` file will be generated with the test results like [this](test/test_20230724033551.log) one.
