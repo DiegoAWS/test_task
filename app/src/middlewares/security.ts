@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from "express";
-import { ENDPOINT_TYPE } from "../constants";
+import { ENDPOINT_TYPE } from "../types";
 import { limiter } from "./trottle-api";
+import { checkUserExist } from "../services/userServices";
 
 const TOKEN_LIMIT_PRIVATE_ENDPOINTS = Number(process.env.TOKEN_LIMIT_PRIVATE_ENDPOINTS || 200)
-const TOKEN_LIMIT_PUBLIC_ENDPOINTS = Number(process.env.TOKEN_LIMIT_PUBLIC_ENDPOINTS || 100)
-
+const IP_LIMIT_PUBLIC_ENDPOINTS = Number(process.env.IP_LIMIT_PUBLIC_ENDPOINTS || 100)
 
 /**
  * 
@@ -31,17 +31,24 @@ export function securer(endpointType: ENDPOINT_TYPE, weight: number = 1) {
                 });
             }
 
-            return limiter(token, TOKEN_LIMIT_PUBLIC_ENDPOINTS, weight)(req, res, next);
+            return limiter(token, IP_LIMIT_PUBLIC_ENDPOINTS, weight)(req, res, next);
         }
         if (endpointType === ENDPOINT_TYPE.PRIVATE) {
             // get token based on auth
             const token = req.header('x-access-token');
-            if (!token) {
+
+            if (!token || ! await checkUserExist(token)) {
                 return res.status(401).json({
-                    message: 'Token not found'
+                    message: 'Invalid token'
                 });
             }
+
             return limiter(token, TOKEN_LIMIT_PRIVATE_ENDPOINTS, weight)(req, res, next);
+        }
+
+        if(endpointType === ENDPOINT_TYPE.NO_AUTH){
+            // JUST FOR TESTING PURPOSES
+            return next();
         }
 
         return res.status(500).json({

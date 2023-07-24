@@ -1,5 +1,5 @@
-import { COUNTER_KEY } from "../constants";
 import { redis } from "../db/redis";
+export const COUNTER_KEY = 'COUNTER_';
 
 /**
  * Get numeric counter from redis
@@ -12,8 +12,11 @@ import { redis } from "../db/redis";
  * // 1
  * 
  */
-export async function getCounter(key: string): Promise<number> {
+export async function getCounter(key: string): Promise<number | null> {
     const counter = await redis.get(COUNTER_KEY + key);
+
+    if (counter === null) return null;
+
     return Number(counter);
 }
 
@@ -42,7 +45,9 @@ export async function setCounter(key: string, value: number, timeToLive?: number
         return;
     }
 
-    await redis.set(COUNTER_KEY + key, value, 'EX', timeToLive);
+    await redis.set(COUNTER_KEY + key, value, {
+        EX: timeToLive
+    });
 }
 
 /**
@@ -61,9 +66,9 @@ export async function setCounter(key: string, value: number, timeToLive?: number
  * 
  */
 export async function decrementCounterBy(key: string, amount: number = 1): Promise<number> {
-    return await redis.decrby(COUNTER_KEY + key, amount);
+    return await redis.decrBy(COUNTER_KEY + key, amount);
 }
 
-export async function getTimeToLive(key: string): Promise<number> {
-    return await redis.ttl(COUNTER_KEY + key);
+export async function getExpireTime(key: string): Promise<number> {
+    return await redis.expireTime(COUNTER_KEY + key);
 }

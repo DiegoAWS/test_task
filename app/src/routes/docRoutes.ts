@@ -1,10 +1,8 @@
 import express from 'express';
-import { securer } from '../middlewares/security';
-import { ENDPOINT_TYPE } from '../constants';
 
 export const docRouter = express.Router();
 
-docRouter.get('/', securer(ENDPOINT_TYPE.PUBLIC), (req, res) => {
+docRouter.use( (req, res) => {
     const documentation = {
         endpoints: [
             {
@@ -18,7 +16,7 @@ docRouter.get('/', securer(ENDPOINT_TYPE.PUBLIC), (req, res) => {
                 path: '/create-user',
                 method: 'POST',
                 description: 'Creates a new user and returns a unique ID',
-                security: 'Public',
+                security: 'No Auth',
                 weight: '1'
             },
             {
@@ -54,7 +52,7 @@ docRouter.get('/', securer(ENDPOINT_TYPE.PUBLIC), (req, res) => {
                 method: 'GET',
                 description: 'Fetches a random programming joke from the Joke API',
                 security: 'Private',
-                weight: '1'
+                weight: '5'
             },
         ]
     }

@@ -2,11 +2,11 @@
   "name": "test_task",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
   "scripts": {
     "build": "npx tsc",
     "start": "node dist/index.js",
-    "dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/index.js\"",
+    "dev": "concurrently \"npm run watch\" -w \"watch\" \"npm run nodemon\"",
+    "nodemon": "nodemon -q dist/index.js",
     "watch": "npx tsc --watch"
   },
   "keywords": [],
@@ -17,7 +17,6 @@
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
-    "ioredis": "^5.3.2",
     "redis": "^4.6.7",
     "uuid": "^9.0.0"
   },

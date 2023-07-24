@@ -1,7 +1,6 @@
 version: '3'
 services:
   web:
-    restart: on-failure
     build:
       context: ../../app
       dockerfile: Dockerfile.dev
@@ -9,7 +8,7 @@ services:
       - ../../app:/usr/src/app
     hostname: web
     ports:
-      - '80:5000'
+      - '3000:3000'
   redis:
     image: redis
     hostname: redis

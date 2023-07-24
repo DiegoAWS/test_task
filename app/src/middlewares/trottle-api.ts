@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { decrementCounterBy, getCounter, getTimeToLive, setCounter } from "../services/counterService.js";
+import { decrementCounterBy, getCounter, getExpireTime, setCounter } from "../services/counterService.js";
 
 const timeWindows = Number(process.env.TIME_WINDOWS_SECONDS || 60);
 
@@ -28,11 +28,10 @@ const timeWindows = Number(process.env.TIME_WINDOWS_SECONDS || 60);
  */
 export function limiter(token: string, tokenLimit: number, weight: number) {
     return async function (req: Request, res: Response, next: NextFunction) {
-
-        console.log({ token })
+        res.setHeader('X-RateLimit-Limit', tokenLimit);
+        res.setHeader('X-RateLimit-Weight', weight);
+        
         const tokenAvailables = await getCounter(token);
-
-        console.log({ tokenAvailables })
 
         if (tokenAvailables===null) {
             const newTokenAvailable = tokenLimit - 1;
@@ -42,6 +41,8 @@ export function limiter(token: string, tokenLimit: number, weight: number) {
             return next();
         }
 
+        
+
         if (tokenAvailables > 0) {
             const counterNewValue = await decrementCounterBy(token, weight);
 
@@ -49,9 +50,9 @@ export function limiter(token: string, tokenLimit: number, weight: number) {
             return next();
         }
 
-        const timeToLive = await getTimeToLive(token);
-
-        res.setHeader('X-RateLimit-Reset', timeToLive);
+        const timeToReset = await getExpireTime(token);
+        res.setHeader('X-RateLimit-Reset',timeToReset);
+        res.setHeader('X-RateLimit-Remaining', 0);
         res.status(429).json({
             message: 'Too many requests'
         });
