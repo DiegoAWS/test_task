@@ -51,17 +51,17 @@ The API server will be available on port `3000`.
 
 ### Running without Docker
 
-To run the project without Docker, you need to start MongoDB and Redis on your machine first. After that, you can navigate to the root directory of the project and run the following commands:
+> First you'll need to have a redis server running and update the entry `REDIS_URL` in `app/.env`
+
+After that, you can navigate to `app/` and run the following commands:
 
 ```sh
 # Install dependencies
 npm install
 
-# Run the API server
-npm start
+# Run the API server in development mode
+npm run dev
 ```
-
-Aditionally you'll need to have a redis server running and update the key `REDIS_URL` in `app/.env`.
 
 The server will start on port `3000`.
 
