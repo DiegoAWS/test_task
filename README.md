@@ -21,6 +21,7 @@ This section provides instructions on how to get a copy of the project running o
 To run this project, you will need to have the following installed:
 
 - Docker
+
 or
 
 - Node.js
