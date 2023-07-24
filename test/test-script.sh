@@ -15,7 +15,7 @@ if ! [[ "$COUNT" =~ ^[0-9]+$ ]]; then
    exit 1
 fi
 
-read -r -p "This script will make $COUNT requests to each endpoint and this will take some time. Do you want to continue? (Y/n) " response
+read -r -p "This script will make $COUNT requests to each endpoint with a different user and this will take some time. Do you want to continue? (Y/n) " response
 response=$(echo "$response" | tr '[:upper:]' '[:lower:]')
 
 if [[ "$response" =~ ^(n|no)$ ]]; then

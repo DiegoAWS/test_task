@@ -11,7 +11,3 @@ services:
   redis:
     image: redis
     hostname: redis
-  test:
-    build:
-      context: ../../test
-      dockerfile: Dockerfile
